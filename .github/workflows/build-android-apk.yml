@@ -36,13 +36,34 @@ jobs:
       run: ./gradlew build --stacktrace
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleRelease
 
     - name: Verify APK Path
-      run: ls -la app/build/outputs/apk/debug/
+      run: ls -la app/build/outputs/apk/release/
 
     - name: Upload APK
       uses: actions/upload-artifact@v2
       with:
         name: app-release.apk
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: app/build/outputs/apk/release/app-release.apk
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        tag_name: 'v1.0.0'
+        release_name: 'Release v1.0.0'
+        draft: false
+        prerelease: false
+
+    - name: Upload APKs to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: app/build/outputs/apk/release/app-release.apk
+        asset_name: app-release.apk
+        asset_content_type: application/vnd.android.package-archive
