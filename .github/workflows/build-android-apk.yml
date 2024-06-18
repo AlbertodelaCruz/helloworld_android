@@ -35,8 +35,11 @@ jobs:
     - name: Download dependencies
       run: ./gradlew build --stacktrace
 
-    - name: Build APK
-      run: ./gradlew assembleRelease
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+
+    - name: Verify APK Path
+      run: ls -la app/build/outputs/apk/debug/
 
     - name: Upload APK
       uses: actions/upload-artifact@v2
